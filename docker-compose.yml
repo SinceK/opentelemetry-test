@@ -1,0 +1,28 @@
+version: "3.7"
+services:
+  toy-app:
+    build:
+      context: dockerfiles/rails
+    environment:
+      BUNDLE_PATH: .bundle
+      BUNDLE_APP_CONFIG: .bundle
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./toy_app:/app/toy_app
+      - ./data/opentelemetry-ruby:/tmp/opentelemetry-ruby
+    working_dir: /app/toy_app
+    command: >
+      bash -c "bin/rails s -p 3000 -b '0.0.0.0' -P /tmp/server.pid"
+    depends_on:
+      - db
+
+  db:
+    image: mysql:5.7
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_ROOT_PASSWORD: ""
+    ports:
+      - '3306:3306'
+    volumes:
+      - ./data/mysql:/var/lib/mysql
